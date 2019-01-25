@@ -1,0 +1,7 @@
+[submodule "hidapi"]
+	path = hidapi
+	url = https://github.com/signal11/hidapi.git
+
+[submodule "json"]
+	path = json
+	url = https://github.com/nlohmann/json.git

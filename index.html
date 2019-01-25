@@ -1,0 +1,107 @@
+
+<!doctype html>
+<html>
+
+<head>
+    <title>CO2 Monitor</title>
+    <script src="Chart.bundle.min.js"></script>
+    <style>
+    canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div style="width:100%;height:100%;">
+        <canvas id="canvas"></canvas>
+    </div>
+    <script>
+
+        window.onload = function() {
+            var xmlhttp = new XMLHttpRequest();
+            var url = "data.json";
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+
+                    var l = [];
+                    var co2 = [];
+                    var temp = [];
+
+                    for(var i = 0; i < myArr.length; i++ ) {
+                        l.push( myArr[i]["time"])
+                        co2.push( myArr[i]["co2"] )
+                        temp.push( myArr[i]["temp"] )
+                    }
+
+                    var lineChartData = {
+                        labels: l,
+                        datasets: [{
+                            label: 'CO2 (ppm)',
+                            borderColor: "red",
+                            backgroundColor: "red",
+                            fill: false,
+                            data: co2,
+                            yAxisID: 'y-axis-1',
+                        }, {
+                            label: 'Temperature (\u2103)',
+                            borderColor: "blue",
+                            backgroundColor: "blue",
+                            fill: false,
+                            data: temp,
+                            yAxisID: 'y-axis-2'
+                        }]
+                    };
+
+                    var ctx = document.getElementById('canvas').getContext('2d');
+                    window.myLine = Chart.Line(ctx, {
+                        data: lineChartData,
+                        options: {
+                            responsive: true,
+                            hoverMode: 'index',
+                            stacked: false,
+                            title: {
+                                display: true,
+                                text: 'Weather'
+                            },
+                            scales: {
+                                yAxes: [{
+                                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                    display: true,
+                                    position: 'left',
+                                    id: 'y-axis-1',
+                                    ticks: {
+                                        min: 400,
+                                        max: 1500,
+                                    }
+                                }, {
+                                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                    display: true,
+                                    position: 'right',
+                                    id: 'y-axis-2',
+                                    ticks: {
+                                        min: 10.0,
+                                        max: 30.0,
+                                    },
+                                    // grid line settings
+                                    gridLines: {
+                                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                    },
+                                }],
+                            }
+                        }
+                    });
+                }
+            };
+
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        };
+    </script>
+</body>
+
+</html>
